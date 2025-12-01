@@ -21,3 +21,15 @@ npm install
 # Lancer le serveur de développement
 npm run dev
 ```
+
+## Structure
+
+```txt
+Projet-Startup/
+src
+└── app
+    ├── api
+    ├── globals.css
+    ├── layout.tsx
+    └── page.tsx
+```
