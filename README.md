@@ -25,7 +25,7 @@ npm run dev
 ## Architecture
 
 Pour comprendre les choix d'architecture de ce projet, consultez la documentation complète ici :  
-[Architecture Overview](./docs/architecture.md)
+[Architecture Overview](./projet-startup/docs/architecture.md)
 
 Cette documentation explique :  
 - La structure des dossiers (`/app`, `/components`, `/lib`, etc.)  
