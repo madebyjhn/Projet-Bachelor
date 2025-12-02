@@ -17,5 +17,11 @@ Overall, a monolithic architecture is **more pragmatic** for this project while 
 ## Structure
 
 ```txt
-
+src
+└── app
+    ├── api
+    │   └── route.tsx
+    ├── globals.css
+    ├── layout.tsx
+    └── page.tsx
 ```
