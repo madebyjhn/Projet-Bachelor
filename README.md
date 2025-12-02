@@ -22,14 +22,13 @@ npm install
 npm run dev
 ```
 
-## Structure
+## Architecture
 
-```txt
-Projet-Startup/
-src
-└── app
-    ├── api
-    ├── globals.css
-    ├── layout.tsx
-    └── page.tsx
-```
+Pour comprendre les choix d'architecture de ce projet, consultez la documentation complète ici :  
+[Architecture Overview](./docs/architecture.md)
+
+Cette documentation explique :  
+- La structure des dossiers (`/app`, `/components`, `/lib`, etc.)  
+- Les décisions techniques (Next.js App Router, Tailwind CSS, React Components)  
+- Les intégrations externes (react-calendly, Formspree)  
+- Les bénéfices : maintenabilité, scalabilité, performance, facilité de déploiement
