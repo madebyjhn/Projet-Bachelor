@@ -28,7 +28,5 @@ Pour comprendre les choix d'architecture de ce projet, consultez la documentatio
 [Architecture Overview](./projet-startup/docs/architecture.md)
 
 Cette documentation explique :  
-- La structure des dossiers (`/app`, `/components`, `/lib`, etc.)  
-- Les décisions techniques (Next.js App Router, Tailwind CSS, React Components)  
-- Les intégrations externes (react-calendly, Formspree)  
+- La structure des dossiers 
 - Les bénéfices : maintenabilité, scalabilité, performance, facilité de déploiement
