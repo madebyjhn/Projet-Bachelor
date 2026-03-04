@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { jwtVerify } from "jose";
 import { pool } from "@/lib/db";
 import type { RowDataPacket } from "mysql2";
+import Sidebar from "../../../components/layout/SideBar";
 
 type ProjectRow = RowDataPacket & {
   id_project: number;
