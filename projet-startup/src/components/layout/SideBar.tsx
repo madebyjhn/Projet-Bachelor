@@ -1,40 +1,108 @@
+"use client";
 import Link from "next/link";
-import { LayoutDashboard, CreditCard, BarChart3, Settings } from "lucide-react";
+import { usePathname } from "next/navigation";
+import {
+  CreditCard,
+  Plus,
+  House,
+  FolderOpen,
+  ChartColumn,
+  Settings,
+} from "lucide-react";
+import { NeumorphicCard } from "../ui/NeumorphicCard";
 
-export default function Sidebar({ projectId }: { projectId: number }) {
+export default function SideBar({
+  projectId,
+  onAddTransaction,
+}: {
+  projectId: number;
+  onAddTransaction: () => void;
+}) {
+  const pathname = usePathname();
+
+  const isDashboardActive = pathname === `/dashboard/${projectId}`;
+
+  const isActive = (href: string) => {
+    return pathname === href;
+  };
+
   return (
-    <aside className="w-64 h-screen bg-white border-r p-6 flex flex-col">
-      <h1 className="text-xl font-bold mb-8">Startup Finance</h1>
+    <aside
+      className="sticky top-20 self-start z-30 w-80 bg-gradient-to-b from-gray-50 to-gray-100 
+      h-[calc(100vh-5rem)] border-r-2 border-gray-200 p-4 lg:p-6 shadow-[2px_0_8px_rgba(0,0,0,0.05)]
+      overflow-y-auto"
+    >
+      <div className="space-y-6">
+        <div className="flex items-center gap-3"></div>
 
-      <nav className="flex flex-col gap-4">
-        <Link href={`/dashboard/${projectId}`}>
-          <div className="flex items-center gap-3 p-2 rounded hover:bg-zinc-100">
-            <LayoutDashboard size={18} />
-            Dashboard
-          </div>
-        </Link>
+        <nav className="space-y-3">
+          <button
+            type="button"
+            className={[
+              "w-full rounded-xl font-medium transition-all duration-300 ease-out active:scale-95 transform hover:-translate-y-0.5 group relative overflow-hidden ",
 
-        <Link href={`/dashboard/${projectId}/transactions`}>
-          <div className="flex items-center gap-3 p-2 rounded hover:bg-zinc-100">
-            <CreditCard size={18} />
-            Transactions
-          </div>
-        </Link>
+              "bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-[4px_4px_8px_#b8b8b8,-4px_-4px_8px_#ffffff] hover:shadow-[6px_6px_12px_#b8b8b8,-6px_-6px_12px_#ffffff] hover:from-violet-600 hover:to-purple-700",
 
-        <Link href={`/dashboard/${projectId}/reports`}>
-          <div className="flex items-center gap-3 p-2 rounded hover:bg-zinc-100">
-            <BarChart3 size={18} />
-            Rapports
-          </div>
-        </Link>
+              "flex items-center justify-center gap-3 py-4 px-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200",
+            ].join(" ")}
+            onClick={onAddTransaction}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-all duration-700" />
+            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+            <span>
+              Ajouter <br /> Transaction
+            </span>
+          </button>
 
-        <Link href={`/dashboard/${projectId}/settings`}>
-          <div className="flex items-center gap-3 p-2 rounded hover:bg-zinc-100">
-            <Settings size={18} />
-            Paramètres
-          </div>
-        </Link>
-      </nav>
+          <NeumorphicCard padding="md" className="bg-white ">
+            <div className="mb-3">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
+                🧭 Navigation
+              </h3>
+            </div>
+            <div className="flex justify-between">
+              <Link
+                href={`/dashboard/${projectId}`}
+                className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 ${isDashboardActive ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
+              >
+                <House /> <span>Dashboard</span>
+              </Link>
+            </div>
+            <div className="flex justify-between mt-2">
+              <Link
+                href={`/dashboard/${projectId}/projets`}
+                className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/projets`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
+              >
+                <FolderOpen /> <span>Projets</span>
+              </Link>
+            </div>
+            <div className="flex justify-between mt-1.5">
+              <Link
+                href={`/dashboard/${projectId}/histotransactions`}
+                className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/histotransactions`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
+              >
+                <CreditCard /> <span>Transactions</span>
+              </Link>
+            </div>
+            <div className="flex justify-between mt-1">
+              <Link
+                href={`/dashboard/${projectId}/rapports`}
+                className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/rapports`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
+              >
+                <ChartColumn /> <span>Rapports</span>
+              </Link>
+            </div>
+            <div className="flex justify-between mt-1">
+              <Link
+                href={`/dashboard/${projectId}/parametres`}
+                className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/parametres`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
+              >
+                <Settings /> <span>Paramètres</span>
+              </Link>
+            </div>
+          </NeumorphicCard>
+        </nav>
+      </div>
     </aside>
   );
 }

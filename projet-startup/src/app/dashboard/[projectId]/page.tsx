@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { jwtVerify } from "jose";
 import { pool } from "@/lib/db";
 import type { RowDataPacket } from "mysql2";
-import Sidebar from "../../../components/layout/SideBar";
+import Dashboard from "./DashboardProject";
 
 type ProjectRow = RowDataPacket & {
   id_project: number;
@@ -13,6 +13,14 @@ type ProjectRow = RowDataPacket & {
   total_revenus: number;
   total_depenses: number;
   benefice: number;
+  rentabilite: number;
+};
+
+type UserRow = RowDataPacket & {
+  id_user: number;
+  nom_complet: string;
+  email: string;
+  url_avatar: string;
 };
 
 export default async function DashboardProject({
@@ -28,33 +36,41 @@ export default async function DashboardProject({
     redirect("/auth");
   }
 
-  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    throw new Error("JWT_SECRET manquant");
+  }
+
+  const secret = new TextEncoder().encode(jwtSecret);
   const { payload } = await jwtVerify(token, secret);
 
   const id_user = Number(payload.sub);
-
   const projectId = Number.parseInt(projectIdRaw, 10);
 
-  if (!Number.isFinite(projectId)) {
+  if (!Number.isFinite(id_user) || !Number.isFinite(projectId)) {
     redirect("/dashboard");
   }
 
-  const [rows] = await pool.query<ProjectRow[]>(
-    "SELECT id_project, id_user, name, description, total_revenus, total_depenses, benefice FROM project WHERE id_project = ? AND id_user = ?",
+  const [projectRows] = await pool.query<ProjectRow[]>(
+    "SELECT id_project, id_user, name, description, total_revenus, total_depenses, benefice, rentabilite FROM project WHERE id_project = ? AND id_user = ? LIMIT 1",
     [projectId, id_user],
   );
 
-  if (rows.length === 0) {
+  if (projectRows.length === 0) {
     redirect("/dashboard");
   }
-  const project = rows[0];
 
-  return (
-    <div>
-      <p>Bienvenue sur votre projet {project.name}</p>
-      <p>Revenus totaux : {project.total_revenus}</p>
-      <p>Revenus depenses : {project.total_depenses}</p>
-      <p> Bénéfice : {project.benefice}</p>
-    </div>
+  const [userRows] = await pool.query<UserRow[]>(
+    "SELECT id_user, nom_complet, email, url_avatar FROM user WHERE id_user = ? LIMIT 1",
+    [id_user],
   );
+
+  if (userRows.length === 0) {
+    redirect("/auth");
+  }
+
+  const project = projectRows[0];
+  const user = userRows[0];
+
+  return <Dashboard project={project} projectId={projectId} user={user} />;
 }
