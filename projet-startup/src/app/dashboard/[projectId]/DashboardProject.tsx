@@ -6,6 +6,8 @@ import TransactionForm from "./transactions/page";
 import TopBar from "../../../components/layout/TopBar";
 import { NeumorphicCard } from "../../../components/ui/NeumorphicCard";
 import { TrendingUp, TrendingDown, HandCoins } from "lucide-react";
+import { LineChart } from "@mui/x-charts/LineChart";
+
 type Project = {
   name: string;
   total_revenus: number;
@@ -30,6 +32,11 @@ export default function Dashboard({
   user: User;
 }) {
   const [openTransaction, setOpenTransaction] = useState(false);
+
+  const handleTransactionSuccess = (newStats: Stats) => {
+    setStats(newStats);
+    setOpenTransaction(false);
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -80,7 +87,7 @@ export default function Dashboard({
               <div>
                 <h1 className="text-sm text-gray-700 pb-1">Rentabilité</h1>
                 <p className="font-bold text-2xl text-red-600">
-                  {`${project.rentabilite}%`}
+                  {`${(project.rentabilite * 100).toFixed(2)} %`}
                 </p>
               </div>
               <div className="flex w-12 h-12 rounded-xl bg-red-100 items-center justify-center text-red-600">
@@ -88,6 +95,9 @@ export default function Dashboard({
               </div>
             </NeumorphicCard>
           </div>
+          <NeumorphicCard>
+            <LineChart />
+          </NeumorphicCard>
         </main>
       </div>
 
@@ -99,6 +109,7 @@ export default function Dashboard({
           <div className="w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
             <TransactionForm
               onClose={() => setOpenTransaction(false)}
+              onSuccess={handleTransactionSuccess}
               projectId={projectId}
             />
           </div>
