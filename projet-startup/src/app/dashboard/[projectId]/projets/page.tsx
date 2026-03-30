@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import TopBar from "../../../../components/layout/TopBar";
 import SideBar from "../../../../components/layout/SideBar";
@@ -14,27 +14,32 @@ type User = {
 
 export default function Projets() {
   const [openTransaction, setOpenTransaction] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
   const params = useParams<{ projectId: string | string[] }>();
   const projectIdRaw = Array.isArray(params.projectId)
     ? params.projectId[0]
     : params.projectId;
   const projectId = Number(projectIdRaw);
 
-  if (!Number.isFinite(projectId)) {
-    return null;
-  }
+  useEffect(() => {
+    fetch("/api/user")
+      .then((res) => res.json())
+      .then((data) => setUser(data))
+      .catch(console.error);
+  }, []);
+
+  if (!Number.isFinite(projectId) || !user) return null;
 
   return (
     <div className="min-h-screen flex flex-col">
-      <TopBar projectId={projectId} user={user} />
-
+      <TopBar projectId={projectId} projectName="" user={user} />
       <div className="flex flex-1">
         <SideBar
           projectId={projectId}
           onAddTransaction={() => setOpenTransaction(true)}
         />
       </div>
-
       {openTransaction && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
