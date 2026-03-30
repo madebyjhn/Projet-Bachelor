@@ -13,12 +13,10 @@ export default function TopBar({
   projectId,
   projectName,
   user,
-  signOut,
 }: {
   projectId: number;
   projectName: string;
   user: User;
-  signOut;
 }) {
   const pathname = usePathname();
   const getTitle = () => {
@@ -41,6 +39,11 @@ export default function TopBar({
       return "Analysez vos performances";
     if (pathname === `/dashboard/${projectId}/parametres`)
       return "Configurez votre compte";
+  };
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/auth";
   };
   return (
     <header className="sticky bg-gradient-to-r from-white via-gray-50 to-white border-b border-gray-200 top-0 z-100 backdrop-blur-sm particles w-full">
@@ -78,7 +81,7 @@ export default function TopBar({
               </div>
             </div>
             <button
-              onClick={signOut}
+              onClick={handleLogout}
               className="flex items-center justify-center w-11 h-11 p-2 rounded-xl shadow-[4px_4px_8px_#b8b8b8,-4px_-4px_8px_#ffffff] hover:shadow-[6px_6px_12px_#b8b8b8,-6px_-6px_12px_#ffffff] transition-all duration-200"
             >
               <LogOut className="w-5 h-5 text-gray-600" />
