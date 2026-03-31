@@ -40,6 +40,7 @@ type Transaction = {
 type CategoryStat = {
   nom: string;
   count: number;
+  total: number;
 };
 
 function useChartData(transactions: Transaction[]) {
@@ -81,6 +82,15 @@ export default function Dashboard({
     );
   };
   const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
+  const COLORS = [
+    "#6366f1",
+    "#10b981",
+    "#f59e0b",
+    "#ef4444",
+    "#8b5cf6",
+    "#06b6d4",
+    "#f43f5e",
+  ];
 
   useEffect(() => {
     fetchCategoryStats();
@@ -188,7 +198,7 @@ export default function Dashboard({
 
           {/* LineChart courbes */}
           <NeumorphicCard className="p-4">
-            <h2 className="text-sm font-semibold text-gray-600 mb-4">
+            <h2 className="text-m font-semibold text-gray-600 mb-4">
               Revenus · Dépenses · Solde cumulé
             </h2>
 
@@ -242,8 +252,8 @@ export default function Dashboard({
           <div className="flex flex-row w-full gap-4">
             {/* PieChart catégories */}
             <NeumorphicCard className="w-1/2">
-              <h2 className="text-sm font-semibold text-gray-600 mb-4">
-                Pourcentage de transactions par catégories
+              <h2 className="text-m font-semibold text-gray-600 mb-4">
+                Répartition des dépenses
               </h2>
               {categoryStats.length === 0 ? (
                 <div className="h-64 flex items-center justify-center text-gray-400 text-sm">
@@ -294,11 +304,41 @@ export default function Dashboard({
             </NeumorphicCard>
 
             {/* Liste catégories */}
-            <NeumorphicCard className="w-1/2"></NeumorphicCard>
+            <NeumorphicCard className="w-1/2 p-4">
+              <h2 className="text-m font-semibold text-gray-600 mb-4">
+                Catégories
+              </h2>
+              <div className="space-y-2 px-2">
+                {categoryStats.map((c, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between hover:bg-gray-50 p-2 rounded-lg transition-all duration-300 hover:scale-105 group cursor-pointer"
+                    style={{ animationDelay: `${i * 0.1}s` }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className="w-4 h-4 rounded-full group-hover:scale-125 transition-transform duration-300"
+                        style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                      />
+                      <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-300">
+                        {c.nom}
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-600 font-semibold group-hover:text-violet-600 transition-colors duration-300">
+                      {Number(c.total).toLocaleString("fr-FR", {
+                        minimumFractionDigits: 2,
+                      })}{" "}
+                      €
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </NeumorphicCard>
           </div>
         </main>
       </div>
 
+      {/* Formulaire de transactions */}
       {openTransaction && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"

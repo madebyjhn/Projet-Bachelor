@@ -28,11 +28,12 @@ export async function GET(req: Request) {
     }
 
     const [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT c.nom, COUNT(t.id_transaction) as count
-       FROM \`transaction\` t
-       JOIN category c ON t.id_category = c.id_category
-       WHERE t.id_project = ? AND t.id_user = ?
-       GROUP BY c.id_category, c.nom`,
+      `SELECT c.nom, COUNT(t.id_transaction) as count, SUM(t.montant) as total
+      FROM \`transaction\` t
+      JOIN category c ON t.id_category = c.id_category
+      WHERE t.id_project = ? AND t.id_user = ?
+      GROUP BY c.id_category, c.nom
+      `,
       [id_project, id_user],
     );
 
