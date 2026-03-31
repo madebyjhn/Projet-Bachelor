@@ -72,15 +72,18 @@ export default function Dashboard({
   user: User;
   transactions?: Transaction[];
 }) {
-  const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
-
-  useEffect(() => {
+  const fetchCategoryStats = () => {
     fetch(`/api/category/stats?id_project=${projectId}`).then((r) =>
       r.json().then((data) => {
         console.log(data);
         setCategoryStats(data);
       }),
     );
+  };
+  const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
+
+  useEffect(() => {
+    fetchCategoryStats();
   }, [projectId]);
 
   const [openTransaction, setOpenTransaction] = useState(false);
@@ -100,6 +103,7 @@ export default function Dashboard({
     setTransactions((prev) =>
       [...prev, newTx].sort((a, b) => a.date.localeCompare(b.date)),
     );
+    fetchCategoryStats();
     setOpenTransaction(false);
   };
 
@@ -181,6 +185,8 @@ export default function Dashboard({
               </div>
             </NeumorphicCard>
           </div>
+
+          {/* LineChart courbes */}
           <NeumorphicCard className="p-4">
             <h2 className="text-sm font-semibold text-gray-600 mb-4">
               Revenus · Dépenses · Solde cumulé
@@ -232,20 +238,64 @@ export default function Dashboard({
               />
             )}
           </NeumorphicCard>
-          <NeumorphicCard>
-            <PieChart
-              series={[
-                {
-                  data: categoryStats.map((c, i) => ({
-                    id: i,
-                    label: c.nom,
-                    value: c.count,
-                  })),
-                },
-              ]}
-              height={200}
-            />
-          </NeumorphicCard>
+
+          <div className="flex flex-row w-full gap-4">
+            {/* PieChart catégories */}
+            <NeumorphicCard className="w-1/2">
+              <h2 className="text-sm font-semibold text-gray-600 mb-4">
+                Pourcentage de transactions par catégories
+              </h2>
+              {categoryStats.length === 0 ? (
+                <div className="h-64 flex items-center justify-center text-gray-400 text-sm">
+                  Aucune transaction pour l&apos;instant. Ajoutez-en une pour
+                  voir le graphique.
+                </div>
+              ) : (
+                <PieChart
+                  colors={[
+                    "#6366f1",
+                    "#10b981",
+                    "#f59e0b",
+                    "#ef4444",
+                    "#8b5cf6",
+                    "#06b6d4",
+                    "#f43f5e",
+                  ]}
+                  series={[
+                    {
+                      data: categoryStats.map((c, i) => ({
+                        id: i,
+                        value: c.count,
+                        label: c.nom,
+                      })),
+                      arcLabel: (item) => {
+                        const total = categoryStats.reduce(
+                          (sum, x) => sum + x.count,
+                          0,
+                        );
+                        return `${item.label} ${((item.value / total) * 100).toFixed(1)}%`;
+                      },
+                      arcLabelMinAngle: 10,
+                      labelRadius: 160,
+                      outerRadius: 110,
+                    },
+                  ]}
+                  height={320}
+                  margin={{ top: 40, bottom: 40, left: 80, right: 80 }}
+                  slotProps={{ legend: { hidden: true } }}
+                  sx={{
+                    "& .MuiPieArcLabel-root": {
+                      fontWeight: 600,
+                      fontSize: "0.75rem",
+                    },
+                  }}
+                />
+              )}
+            </NeumorphicCard>
+
+            {/* Liste catégories */}
+            <NeumorphicCard className="w-1/2"></NeumorphicCard>
+          </div>
         </main>
       </div>
 
