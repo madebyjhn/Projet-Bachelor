@@ -82,7 +82,6 @@ export async function POST(req: Request) {
       [total_revenus, total_depenses, benefice, rentabilite, id_project],
     );
 
-    // Normalise la date au format YYYY-MM-DD
     const normalizedDate = String(date).split("T")[0];
 
     return NextResponse.json(
