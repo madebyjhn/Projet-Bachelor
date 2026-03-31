@@ -6,7 +6,9 @@ import TransactionForm from "./transactions/page";
 import TopBar from "../../../components/layout/TopBar";
 import { NeumorphicCard } from "../../../components/ui/NeumorphicCard";
 import { TrendingUp, TrendingDown, HandCoins, Percent } from "lucide-react";
-import { LineChart } from "@mui/x-charts/LineChart";
+import { LineChart, PieChart } from "@mui/x-charts";
+import { log } from "../../../../node_modules/handlebars/types/index.d";
+import height from "../../../../node_modules/dom-helpers/cjs/height.d";
 
 type Project = {
   name: string;
@@ -73,13 +75,13 @@ export default function Dashboard({
   const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
 
   useEffect(() => {
-    fetch(`/api/category/stats/id_project=${projectId}.then`).then((r) =>
+    fetch(`/api/category/stats?id_project=${projectId}`).then((r) =>
       r.json().then((data) => {
+        console.log(data);
         setCategoryStats(data);
-        console.log(categoryStats);
       }),
     );
-  }, [projectId, categoryStats]);
+  }, [projectId]);
 
   const [openTransaction, setOpenTransaction] = useState(false);
 
@@ -230,10 +232,23 @@ export default function Dashboard({
               />
             )}
           </NeumorphicCard>
+          <NeumorphicCard>
+            <PieChart
+              series={[
+                {
+                  data: categoryStats.map((c, i) => ({
+                    id: i,
+                    label: c.nom,
+                    value: c.count,
+                  })),
+                },
+              ]}
+              height={200}
+            />
+          </NeumorphicCard>
         </main>
       </div>
 
-      {/* ── Modale transaction ──────────────────────────────────────────────── */}
       {openTransaction && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
