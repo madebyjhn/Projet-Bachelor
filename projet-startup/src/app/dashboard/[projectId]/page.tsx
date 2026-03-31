@@ -23,6 +23,12 @@ type UserRow = RowDataPacket & {
   url_avatar: string;
 };
 
+type TxRow = RowDataPacket & {
+  date: string;
+  type: "income" | "expense";
+  montant: number;
+};
+
 export default async function DashboardProject({
   params,
 }: {
@@ -32,14 +38,10 @@ export default async function DashboardProject({
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 
-  if (!token) {
-    redirect("/auth");
-  }
+  if (!token) redirect("/auth");
 
   const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret) {
-    throw new Error("JWT_SECRET manquant");
-  }
+  if (!jwtSecret) throw new Error("JWT_SECRET manquant");
 
   const secret = new TextEncoder().encode(jwtSecret);
   const { payload } = await jwtVerify(token, secret);
@@ -52,25 +54,39 @@ export default async function DashboardProject({
   }
 
   const [projectRows] = await pool.query<ProjectRow[]>(
-    "SELECT id_project, id_user, name, description, total_revenus, total_depenses, benefice, rentabilite FROM project WHERE id_project = ? AND id_user = ? LIMIT 1",
+    `SELECT id_project, id_user, name, description,
+            total_revenus, total_depenses, benefice, rentabilite
+     FROM project
+     WHERE id_project = ? AND id_user = ?
+     LIMIT 1`,
     [projectId, id_user],
   );
 
-  if (projectRows.length === 0) {
-    redirect("/dashboard");
-  }
+  if (projectRows.length === 0) redirect("/dashboard");
 
   const [userRows] = await pool.query<UserRow[]>(
     "SELECT id_user, nom_complet, email, url_avatar FROM user WHERE id_user = ? LIMIT 1",
     [id_user],
   );
 
-  if (userRows.length === 0) {
-    redirect("/auth");
-  }
+  if (userRows.length === 0) redirect("/auth");
 
-  const project = projectRows[0];
-  const user = userRows[0];
+  const [txRows] = await pool.query<TxRow[]>(
+    `SELECT DATE_FORMAT(date, '%Y-%m-%d') AS date, type, montant
+     FROM \`transaction\`
+     WHERE id_project = ?
+     ORDER BY date ASC`,
+    [projectId],
+  );
 
-  return <Dashboard project={project} projectId={projectId} user={user} />;
+  console.log("txRows:", JSON.stringify(txRows, null, 2));
+
+  return (
+    <Dashboard
+      project={projectRows[0]}
+      projectId={projectId}
+      user={userRows[0]}
+      transactions={txRows}
+    />
+  );
 }

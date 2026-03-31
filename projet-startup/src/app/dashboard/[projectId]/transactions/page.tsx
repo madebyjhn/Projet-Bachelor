@@ -10,17 +10,23 @@ type Stats = {
   rentabilite: number;
 };
 
+type Transaction = {
+  date: string;
+  type: "income" | "expense";
+  montant: number;
+};
+
 export default function TransactionForm({
   onClose,
   onSuccess,
   projectId,
 }: {
   onClose: () => void;
-  onSuccess: (stats: Stats) => void;
+  onSuccess: (stats: Stats, transaction: Transaction) => void;
   projectId: number;
 }) {
   const [description, setDescription] = useState("");
-  const [type, setType] = useState("");
+  const [type, setType] = useState<"income" | "expense" | "">("");
   const [date, setDate] = useState("");
   const [montant, setMontant] = useState(0);
   const [category_name, setCategory_name] = useState("");
@@ -53,7 +59,7 @@ export default function TransactionForm({
         return;
       }
 
-      onSuccess(data.stats);
+      onSuccess(data.stats, data.transaction);
     } catch {
       setError("Erreur réseau. Réessaie.");
     } finally {
@@ -94,7 +100,9 @@ export default function TransactionForm({
             </label>
             <select
               value={type}
-              onChange={(e) => setType(e.target.value)}
+              onChange={(e) =>
+                setType(e.target.value as "income" | "expense" | "")
+              }
               className="w-full px-4 py-3 bg-gray-100 rounded-xl border-none outline-none shadow-[inset_4px_4px_8px_#b8b8b8,inset_-4px_-4px_8px_#ffffff] focus:shadow-[inset_6px_6px_12px_#b8b8b8,inset_-6px_-6px_12px_#ffffff] transition-shadow text-gray-700"
             >
               <option value="">Choisir</option>
