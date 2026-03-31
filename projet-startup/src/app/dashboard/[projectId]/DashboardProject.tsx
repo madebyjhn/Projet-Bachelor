@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SideBar from "../../../components/layout/SideBar";
 import TransactionForm from "./transactions/page";
 import TopBar from "../../../components/layout/TopBar";
@@ -35,6 +35,11 @@ type Transaction = {
   montant: number;
 };
 
+type CategoryStat = {
+  nom: string;
+  count: number;
+};
+
 function useChartData(transactions: Transaction[]) {
   const byDate = new Map<string, { revenus: number; depenses: number }>();
 
@@ -65,6 +70,17 @@ export default function Dashboard({
   user: User;
   transactions?: Transaction[];
 }) {
+  const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/category/stats/id_project=${projectId}.then`).then((r) =>
+      r.json().then((data) => {
+        setCategoryStats(data);
+        console.log(categoryStats);
+      }),
+    );
+  }, [projectId, categoryStats]);
+
   const [openTransaction, setOpenTransaction] = useState(false);
 
   const [stats, setStats] = useState<Stats>({
