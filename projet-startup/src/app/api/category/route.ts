@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { pool } from "../../../lib/db";
 import { NextResponse } from "next/server";
+import { jwtVerify } from "jose";
 
 export async function GET() {
   try {
@@ -20,7 +21,7 @@ export async function GET() {
     }
 
     const [rows] = await pool.query(
-      "SELECT id_category, nom FROM category WERE id_user = ?;",
+      "SELECT id_category, nom FROM category WEHRE id_user = ?;",
       [id_user],
     );
 
@@ -30,6 +31,8 @@ export async function GET() {
         { status: 404 },
       );
     }
+
+    return;
   } catch (error) {
     console.error("CATEGORY_GET_ERROR", error);
     return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
