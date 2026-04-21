@@ -25,7 +25,7 @@ export default function Home() {
       />
 
       {/* Nav */}
-      <nav className="relative z-10 flex items-center justify-between px-8 py-6 max-w-6xl mx-auto">
+      <nav className="relative z-10 flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 max-w-6xl mx-auto">
         <div className="flex items-center gap-3">
           {/* Logo mark */}
           <svg
@@ -125,7 +125,7 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <section className="relative z-10 flex flex-col items-center text-center px-6 pt-20 pb-32 max-w-4xl mx-auto">
+      <section className="relative z-10 flex flex-col items-center text-center px-4 sm:px-6 pt-12 sm:pt-20 pb-20 sm:pb-32 max-w-4xl mx-auto">
         {/* Badge */}
         <div
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium mb-10"
@@ -144,7 +144,7 @@ export default function Home() {
 
         {/* Headline */}
         <h1
-          className="text-6xl font-bold leading-[1.08] tracking-tight mb-6"
+          className="text-4xl sm:text-6xl font-bold leading-[1.08] tracking-tight mb-6"
           style={{ fontFamily: "'Sora', sans-serif" }}
         >
           Pilotez votre{" "}
@@ -168,7 +168,7 @@ export default function Home() {
         </p>
 
         {/* CTA */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
           <Link
             href="/auth"
             className="group relative inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5"
@@ -206,7 +206,7 @@ export default function Home() {
       </section>
 
       {/* Feature cards */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 pb-32">
+      <section className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pb-20 sm:pb-32">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
             {

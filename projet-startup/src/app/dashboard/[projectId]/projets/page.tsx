@@ -14,6 +14,7 @@ type User = {
 
 export default function Projets() {
   const [openTransaction, setOpenTransaction] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
   const params = useParams<{ projectId: string | string[] }>();
@@ -33,11 +34,24 @@ export default function Projets() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <TopBar projectId={projectId} projectName="" user={user} />
+      <TopBar
+        projectId={projectId}
+        projectName=""
+        user={user}
+        onToggleSidebar={() => setSidebarOpen((o) => !o)}
+      />
       <div className="flex flex-1">
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
         <SideBar
           projectId={projectId}
           onAddTransaction={() => setOpenTransaction(true)}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
         />
       </div>
       {openTransaction && (

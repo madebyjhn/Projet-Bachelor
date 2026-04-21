@@ -1,172 +1,256 @@
 "use client";
 
-import { useState } from "react";
-import { Plus } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import TopBar from "../../../../components/layout/TopBar";
+import SideBar from "../../../../components/layout/SideBar";
+import TransactionForm from "../../../../components/transactions/TransactionForm";
+import { NeumorphicCard } from "../../../../components/ui/NeumorphicCard";
+import {
+  TrendingUp,
+  TrendingDown,
+  Pencil,
+  Trash2,
+  Calendar,
+  Euro,
+  ArrowUpDown,
+} from "lucide-react";
 
-type Stats = {
-  total_revenus: number;
-  total_depenses: number;
-  benefice: number;
-  rentabilite: number;
+type User = {
+  nom_complet: string;
+  email: string;
+  url_avatar: string;
 };
 
 type Transaction = {
-  date: string;
+  id_transaction: number;
+  description: string;
   type: "income" | "expense";
+  date: string;
   montant: number;
+  category_name: string;
 };
 
-export default function TransactionForm({
-  onClose,
-  onSuccess,
-  projectId,
-}: {
-  onClose: () => void;
-  onSuccess: (stats: Stats, transaction: Transaction) => void;
-  projectId: number;
-}) {
-  const [description, setDescription] = useState("");
-  const [type, setType] = useState<"income" | "expense" | "">("");
-  const [date, setDate] = useState("");
-  const [montant, setMontant] = useState(0);
-  const [category_name, setCategory_name] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+export default function TransactionPage() {
+  const [openTransaction, setOpenTransaction] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
-    setSubmitting(true);
+  // Mise en place des filtres
 
-    try {
-      const res = await fetch("/api/transaction", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          description,
-          type,
-          date,
-          montant,
-          category_name,
-          id_project: projectId,
-        }),
-      });
+  const [search, setSearch] = useState("");
+  const [filterType, setFilterType] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+  const [sortBy, setSortBy] = useState<"date" | "montant">("date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-      const data = await res.json();
+  const filtered = transactions
+    .filter((t) => t.description.toLowerCase().includes(search.toLowerCase()))
+    .filter((t) => !filterType || t.type === filterType)
+    .filter((t) => !filterCategory || t.category_name === filterCategory)
+    .sort((a, b) => {
+      const sign = (t: Transaction) =>
+        t.type === "expense" ? -t.montant : t.montant;
+      const v =
+        sortBy === "date" ? a.date.localeCompare(b.date) : sign(a) - sign(b);
+      return sortOrder === "asc" ? v : -v;
+    });
 
-      if (!res.ok) {
-        setError(data.message || "Erreur lors de la création.");
-        return;
-      }
+  const categories = [...new Set(filtered.map((t) => t.category_name))];
 
-      onSuccess(data.stats, data.transaction);
-    } catch {
-      setError("Erreur réseau. Réessaie.");
-    } finally {
-      setSubmitting(false);
-    }
+  const params = useParams<{ projectId: string | string[] }>();
+
+  const projectIdRaw = Array.isArray(params.projectId)
+    ? params.projectId[0]
+    : params.projectId;
+  const projectId = Number(projectIdRaw);
+
+  useEffect(() => {
+    fetch("/api/user")
+      .then((res) => res.json())
+      .then((data) => setUser(data))
+      .catch(console.error);
+
+    fetch(`/api/transaction?id_project=${projectId}`)
+      .then((res) => res.json())
+      .then((data) => setTransactions(data));
+  }, [projectId]);
+
+  if (!Number.isFinite(projectId) || !user) return null;
+
+  const handleDeleteTransaction = (id_transaction) => {
+    fetch(`/api/transaction?id_transaction=${id_transaction}`, {
+      method: "DELETE",
+    }).then(() => {
+      setTransactions((prev) =>
+        prev.filter((t) => t.id_transaction !== id_transaction),
+      );
+    });
   };
 
   return (
-    <div className="bg-gray-100 rounded-2xl p-6 shadow-[8px_8px_16px_#b8b8b8,-8px_-8px_16px_#ffffff]">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-800">
-          Nouvelle transaction
-        </h2>
-        <button
-          onClick={onClose}
-          className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
-        >
-          <Plus className="w-5 h-5 text-gray-600 rotate-45" />
-        </button>
+    <div className="h-screen flex flex-col overflow-hidden">
+      <TopBar
+        projectId={projectId}
+        projectName=""
+        user={user}
+        onToggleSidebar={() => setSidebarOpen((o) => !o)}
+      />
+      <div className="flex flex-1">
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+        <SideBar
+          projectId={projectId}
+          onAddTransaction={() => setOpenTransaction(true)}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
+        <main className="flex-1 p-3 sm:p-6 space-y-4 sm:space-y-6 min-w-0">
+          {/* Barre de filtrage */}
+          <NeumorphicCard className="flex flex-col gap-4">
+            <div className="grid grid-cols-8 gap-6 mb-3">
+              <input
+                type="text"
+                placeholder="Rechercher..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="col-start-1 col-end-3 px-4 py-3 bg-gray-100 rounded-xl border-none outline-none shadow-[inset_4px_4px_8px_#b8b8b8,inset_-4px_-4px_8px_#ffffff] focus:shadow-[inset_6px_6px_12px_#b8b8b8,inset_-6px_-6px_12px_#ffffff] transition-shadow text-gray-700"
+              />
+              <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                className="col-start-3 col-end-5 px-4 py-3 bg-gray-100 rounded-xl border-none outline-none shadow-[inset_4px_4px_8px_#b8b8b8,inset_-4px_-4px_8px_#ffffff] focus:shadow-[inset_6px_6px_12px_#b8b8b8,inset_-6px_-6px_12px_#ffffff] transition-shadow text-gray-700"
+              >
+                <option value="">Tous les types</option>
+                <option value="income">Revenus</option>
+                <option value="expense">Dépenses</option>
+              </select>
+
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="col-start-5 col-end-7 px-4 py-3 bg-gray-100 rounded-xl border-none outline-none shadow-[inset_4px_4px_8px_#b8b8b8,inset_-4px_-4px_8px_#ffffff] focus:shadow-[inset_6px_6px_12px_#b8b8b8,inset_-6px_-6px_12px_#ffffff] transition-shadow text-gray-700"
+              >
+                <option value="">Toutes les catégories</option>
+                {categories.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={() => {
+                  setSortBy("date");
+                  setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
+                }}
+                className={`rounded-xl transition-all duration-200 flex items-center justify-center gap-1 px-3 py-2 ${sortBy === "date" ? "text-white bg-linear-to-r from-violet-500 to-violet-600" : "hover:bg-gray-200"}`}
+              >
+                <Calendar className="w-4 h-4" />
+                <ArrowUpDown className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => {
+                  setSortBy("montant");
+                  setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
+                }}
+                className={`rounded-xl transition-all duration-200 flex items-center justify-center gap-1 px-3 py-2 ${sortBy === "montant" ? "text-white bg-linear-to-r from-violet-500 to-violet-600" : "hover:bg-gray-200"}`}
+              >
+                <Euro className="w-4 h-4" />
+                <ArrowUpDown className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-500">
+              {filtered.length}
+              {filtered.length === 1
+                ? " transaction trouvée"
+                : " transactions trouvées"}
+            </p>
+          </NeumorphicCard>
+
+          {/* Liste des transactions */}
+          <NeumorphicCard className="flex flex-col gap-4 animate-slide-up">
+            <h1 className="font-bold text-2xl">Transactions</h1>
+            <div className="flex flex-col gap-4 overflow-y-auto overflow-x-hidden max-h-96">
+              {filtered.map((t, i) => (
+                <div
+                  key={i}
+                  className="flex group justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200 "
+                >
+                  <div className="flex gap-2 min-w-0">
+                    <div
+                      className={`flex justify-center items-center w-10 h-10 ${t.type === "income" ? "bg-emerald-100 text-green-600" : "bg-red-100 text-red-600"}  rounded-xl`}
+                    >
+                      {t.type === "expense" ? (
+                        <TrendingDown className="w-5 h-5" />
+                      ) : (
+                        <TrendingUp className="w-5 h-5" />
+                      )}
+                    </div>
+                    <div>
+                      <h2 className="font-semibold">{t.description}</h2>
+                      <div className="flex flex-row gap-2 items-center">
+                        <p className="text-sm text-gray-500">
+                          {t.category_name}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {new Date(t.date).toLocaleDateString("fr-FR", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <p
+                      className={`font-bold ${t.type === "income" ? "text-emerald-600" : "text-red-600"}`}
+                    >
+                      {t.type === "expense"
+                        ? `-${t.montant} €`
+                        : `+${t.montant} €`}
+                    </p>
+                    <div className="w-0 overflow-hidden group-hover:w-10 transition-all duration-200 flex gap-2">
+                      <button className="flex">
+                        <Pencil className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDeleteTransaction(t.id_transaction)
+                        }
+                        className="flex"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-400 hover:text-red-600" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </NeumorphicCard>
+        </main>
       </div>
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Montant <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              value={montant}
-              onChange={(e) => setMontant(Number(e.target.value))}
-              className="w-full px-4 py-3 bg-gray-100 rounded-xl border-none outline-none shadow-[inset_4px_4px_8px_#b8b8b8,inset_-4px_-4px_8px_#ffffff] focus:shadow-[inset_6px_6px_12px_#b8b8b8,inset_-6px_-6px_12px_#ffffff] transition-shadow text-gray-700"
+      {/* Formulaire de transactions */}
+      {openTransaction && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setOpenTransaction(false)}
+        >
+          <div className="w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+            <TransactionForm
+              onClose={() => setOpenTransaction(false)}
+              onSuccess={() => setOpenTransaction(false)}
+              projectId={projectId}
             />
           </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Type <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={type}
-              onChange={(e) =>
-                setType(e.target.value as "income" | "expense" | "")
-              }
-              className="w-full px-4 py-3 bg-gray-100 rounded-xl border-none outline-none shadow-[inset_4px_4px_8px_#b8b8b8,inset_-4px_-4px_8px_#ffffff] focus:shadow-[inset_6px_6px_12px_#b8b8b8,inset_-6px_-6px_12px_#ffffff] transition-shadow text-gray-700"
-            >
-              <option value="">Choisir</option>
-              <option value="income">Revenu</option>
-              <option value="expense">Dépense</option>
-            </select>
-          </div>
         </div>
-
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Description <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-100 rounded-xl border-none outline-none shadow-[inset_4px_4px_8px_#b8b8b8,inset_-4px_-4px_8px_#ffffff] focus:shadow-[inset_6px_6px_12px_#b8b8b8,inset_-6px_-6px_12px_#ffffff] transition-shadow text-gray-700"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Catégorie <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={category_name}
-            onChange={(e) => setCategory_name(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-100 rounded-xl border-none outline-none shadow-[inset_4px_4px_8px_#b8b8b8,inset_-4px_-4px_8px_#ffffff] focus:shadow-[inset_6px_6px_12px_#b8b8b8,inset_-6px_-6px_12px_#ffffff] transition-shadow text-gray-700"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Date <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-100 rounded-xl border-none outline-none shadow-[inset_4px_4px_8px_#b8b8b8,inset_-4px_-4px_8px_#ffffff] focus:shadow-[inset_6px_6px_12px_#b8b8b8,inset_-6px_-6px_12px_#ffffff] transition-shadow text-gray-700"
-          />
-        </div>
-
-        {error && <p className="text-sm text-red-500">{error}</p>}
-
-        <div className="flex space-x-3 pt-4">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="flex-1 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-xl font-medium py-3 px-6 transition-all duration-300 hover:from-violet-600 hover:to-purple-700 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {submitting ? "Ajout en cours..." : "Ajouter"}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="bg-gray-100 text-gray-700 rounded-xl font-medium py-3 px-6 shadow-[4px_4px_8px_#b8b8b8,-4px_-4px_8px_#ffffff] hover:bg-gray-200 transition-all duration-300"
-          >
-            Annuler
-          </button>
-        </div>
-      </form>
+      )}
     </div>
   );
 }

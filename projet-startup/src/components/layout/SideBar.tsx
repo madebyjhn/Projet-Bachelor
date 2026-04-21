@@ -14,9 +14,13 @@ import { NeumorphicCard } from "../ui/NeumorphicCard";
 export default function SideBar({
   projectId,
   onAddTransaction,
+  isOpen = false,
+  onClose,
 }: {
   projectId: number;
   onAddTransaction: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }) {
   const pathname = usePathname();
 
@@ -28,9 +32,13 @@ export default function SideBar({
 
   return (
     <aside
-      className="sticky top-20 self-start z-30 w-80 bg-gradient-to-b from-gray-50 to-gray-100 
-      h-[calc(100vh-5rem)] border-r-2 border-gray-200 p-4 lg:p-6 shadow-[2px_0_8px_rgba(0,0,0,0.05)]
-      overflow-y-auto"
+      className={`
+        fixed top-20 left-0 h-[calc(100vh-5rem)] z-40 w-80 bg-gradient-to-b from-gray-50 to-gray-100
+        border-r-2 border-gray-200 p-4 lg:p-6 shadow-[2px_0_8px_rgba(0,0,0,0.05)] overflow-y-auto
+        transition-transform duration-300 ease-in-out
+        lg:sticky lg:top-20 lg:self-start lg:h-[calc(100vh-5rem)] lg:translate-x-0 lg:z-30
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+      `}
     >
       <div className="space-y-6">
         <div className="flex items-center gap-3"></div>
@@ -45,7 +53,10 @@ export default function SideBar({
 
               "flex items-center justify-center gap-3 py-4 px-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200",
             ].join(" ")}
-            onClick={onAddTransaction}
+            onClick={() => {
+              onAddTransaction();
+              onClose?.();
+            }}
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-all duration-700" />
             <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
@@ -63,6 +74,7 @@ export default function SideBar({
             <div className="flex justify-between">
               <Link
                 href={`/dashboard/${projectId}`}
+                onClick={onClose}
                 className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 ${isDashboardActive ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
               >
                 <House /> <span>Dashboard</span>
@@ -71,6 +83,7 @@ export default function SideBar({
             <div className="flex justify-between mt-2">
               <Link
                 href={`/dashboard/${projectId}/projets`}
+                onClick={onClose}
                 className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/projets`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
               >
                 <FolderOpen /> <span>Projets</span>
@@ -78,8 +91,9 @@ export default function SideBar({
             </div>
             <div className="flex justify-between mt-1.5">
               <Link
-                href={`/dashboard/${projectId}/histotransactions`}
-                className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/histotransactions`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
+                href={`/dashboard/${projectId}/transactions`}
+                onClick={onClose}
+                className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/transactions`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
               >
                 <CreditCard /> <span>Transactions</span>
               </Link>
@@ -87,6 +101,7 @@ export default function SideBar({
             <div className="flex justify-between mt-1">
               <Link
                 href={`/dashboard/${projectId}/rapports`}
+                onClick={onClose}
                 className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/rapports`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
               >
                 <ChartColumn /> <span>Rapports</span>
@@ -95,6 +110,7 @@ export default function SideBar({
             <div className="flex justify-between mt-1">
               <Link
                 href={`/dashboard/${projectId}/parametres`}
+                onClick={onClose}
                 className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/parametres`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
               >
                 <Settings /> <span>Paramètres</span>

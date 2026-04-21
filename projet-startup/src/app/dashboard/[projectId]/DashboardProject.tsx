@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import SideBar from "../../../components/layout/SideBar";
-import TransactionForm from "./transactions/page";
+import TransactionForm from "../../../components/transactions/TransactionForm";
 import TopBar from "../../../components/layout/TopBar";
 import { NeumorphicCard } from "../../../components/ui/NeumorphicCard";
 import { TrendingUp, TrendingDown, HandCoins, Percent } from "lucide-react";
@@ -97,6 +97,7 @@ export default function Dashboard({
   }, [projectId]);
 
   const [openTransaction, setOpenTransaction] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [stats, setStats] = useState<Stats>({
     total_revenus: project.total_revenus,
@@ -131,20 +132,33 @@ export default function Dashboard({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <TopBar projectId={projectId} projectName={project.name} user={user} />
+      <TopBar
+        projectId={projectId}
+        projectName={project.name}
+        user={user}
+        onToggleSidebar={() => setSidebarOpen((o) => !o)}
+      />
 
       <div className="flex flex-1">
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
         <SideBar
           projectId={projectId}
           onAddTransaction={() => setOpenTransaction(true)}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
         />
 
-        <main className="flex-1 p-6 space-y-6">
-          <div className="flex flex-row w-full gap-4">
-            <NeumorphicCard className="flex flex-row w-1/4 p-4 justify-between items-center">
+        <main className="flex-1 p-3 sm:p-6 space-y-4 sm:space-y-6 min-w-0">
+          <div className="grid grid-cols-2 lg:grid-cols-4 w-full gap-4">
+            <NeumorphicCard className="flex flex-row p-4 justify-between items-center">
               <div>
                 <h1 className="text-sm text-gray-500 pb-1">Revenus totaux</h1>
-                <p className="font-bold text-2xl text-emerald-600">
+                <p className="font-bold text-xl sm:text-2xl text-emerald-600">
                   {stats.total_revenus.toLocaleString("fr-FR")} €
                 </p>
               </div>
@@ -153,10 +167,10 @@ export default function Dashboard({
               </div>
             </NeumorphicCard>
 
-            <NeumorphicCard className="flex flex-row w-1/4 p-4 justify-between items-center">
+            <NeumorphicCard className="flex flex-row p-4 justify-between items-center">
               <div>
                 <h1 className="text-sm text-gray-500 pb-1">Dépenses totales</h1>
-                <p className="font-bold text-2xl text-red-600">
+                <p className="font-bold text-xl sm:text-2xl text-red-600">
                   {stats.total_depenses.toLocaleString("fr-FR")} €
                 </p>
               </div>
@@ -165,11 +179,11 @@ export default function Dashboard({
               </div>
             </NeumorphicCard>
 
-            <NeumorphicCard className="flex flex-row w-1/4 p-4 justify-between items-center">
+            <NeumorphicCard className="flex flex-row p-4 justify-between items-center">
               <div>
                 <h1 className="text-sm text-gray-500 pb-1">Bénéfice net</h1>
                 <p
-                  className={`font-bold text-2xl ${stats.benefice >= 0 ? "text-emerald-600" : "text-red-600"}`}
+                  className={`font-bold text-xl sm:text-2xl ${stats.benefice >= 0 ? "text-emerald-600" : "text-red-600"}`}
                 >
                   {stats.benefice.toLocaleString("fr-FR")} €
                 </p>
@@ -181,10 +195,12 @@ export default function Dashboard({
               </div>
             </NeumorphicCard>
 
-            <NeumorphicCard className="flex flex-row w-1/4 p-4 justify-between items-center">
+            <NeumorphicCard className="flex flex-row p-4 justify-between items-center">
               <div>
                 <h1 className="text-sm text-gray-500 pb-1">Rentabilité</h1>
-                <p className={`font-bold text-2xl ${rentabiliteColor}`}>
+                <p
+                  className={`font-bold text-xl sm:text-2xl ${rentabiliteColor}`}
+                >
                   {(stats.rentabilite * 100).toFixed(2)} %
                 </p>
               </div>
@@ -249,9 +265,9 @@ export default function Dashboard({
             )}
           </NeumorphicCard>
 
-          <div className="flex flex-row w-full gap-4">
+          <div className="flex flex-col lg:flex-row w-full gap-4">
             {/* PieChart catégories */}
-            <NeumorphicCard className="w-1/2">
+            <NeumorphicCard className="w-full lg:w-1/2">
               <h2 className="text-m font-semibold text-gray-600 mb-4">
                 Répartition des dépenses
               </h2>
@@ -304,7 +320,7 @@ export default function Dashboard({
             </NeumorphicCard>
 
             {/* Liste catégories */}
-            <NeumorphicCard className="w-1/2 p-4">
+            <NeumorphicCard className="w-full lg:w-1/2 p-4">
               <h2 className="text-m font-semibold text-gray-600 mb-4">
                 Catégories
               </h2>
@@ -327,7 +343,7 @@ export default function Dashboard({
                     <span className="text-sm text-gray-600 font-semibold group-hover:text-violet-600 transition-colors duration-300">
                       {Number(c.total).toLocaleString("fr-FR", {
                         minimumFractionDigits: 2,
-                      })}{" "}
+                      })}
                       €
                     </span>
                   </div>
