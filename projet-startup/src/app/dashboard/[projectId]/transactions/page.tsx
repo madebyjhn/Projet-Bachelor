@@ -33,6 +33,8 @@ type Transaction = {
 
 export default function TransactionPage() {
   const [openTransaction, setOpenTransaction] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -216,7 +218,13 @@ export default function TransactionPage() {
                         : `+${t.montant} €`}
                     </p>
                     <div className="w-0 overflow-hidden group-hover:w-10 transition-all duration-200 flex gap-2">
-                      <button className="flex">
+                      <button
+                        className="flex"
+                        onClick={() => {
+                          setSelectedTransaction(t);
+                          setOpenTransaction(true);
+                        }}
+                      >
                         <Pencil className="w-4 h-4 text-gray-400 hover:text-gray-600" />
                       </button>
                       <button
@@ -244,9 +252,25 @@ export default function TransactionPage() {
         >
           <div className="w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
             <TransactionForm
-              onClose={() => setOpenTransaction(false)}
-              onSuccess={() => setOpenTransaction(false)}
+              onClose={() => {
+                setOpenTransaction(false);
+                setSelectedTransaction(null);
+              }}
+              onSuccess={(_, updatedTx) => {
+                if (selectedTransaction && updatedTx) {
+                  setTransactions((prev) =>
+                    prev.map((t) =>
+                      t.id_transaction === selectedTransaction.id_transaction
+                        ? { ...t, ...updatedTx }
+                        : t,
+                    ),
+                  );
+                }
+                setOpenTransaction(false);
+                setSelectedTransaction(null);
+              }}
               projectId={projectId}
+              transaction={selectedTransaction ?? undefined}
             />
           </div>
         </div>

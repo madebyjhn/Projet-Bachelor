@@ -205,7 +205,7 @@ export async function DELETE(req: Request) {
   }
 }
 
-export async function PUT(res: Request) {
+export async function PUT(req: Request) {
   try {
     const id_user = await authenticate();
     if (!id_user) {
@@ -237,9 +237,27 @@ export async function PUT(res: Request) {
 
     const id_project = (txRows as { id_project: number }[])[0].id_project;
 
-    const [rows] = await pool.query(
-      "UPDATE transaction SET description = ?, type = ?, date = ?, montant = ? WHERE id_transaction = ? AND id_user = ?",
-      [descritpion, type, date, montant, id_transaction, id_user],
+    const { description, type, date, montant, category_name } = await req.json();
+
+    let id_category = 0;
+    const [category] = await pool.query(
+      "SELECT id_category FROM category WHERE nom = ? AND id_user = ?",
+      [category_name, id_user],
+    );
+
+    if ((category as []).length === 0) {
+      const [inst] = await pool.query(
+        "INSERT INTO category (nom, id_user) VALUES (?, ?)",
+        [category_name, id_user],
+      );
+      id_category = (inst as { insertId: number }).insertId;
+    } else {
+      id_category = (category as { id_category: number }[])[0].id_category;
+    }
+
+    await pool.query(
+      "UPDATE `transaction` SET description = ?, type = ?, date = ?, montant = ?, id_category = ? WHERE id_transaction = ? AND id_user = ?",
+      [description, type, date, montant, id_category, id_transaction, id_user],
     );
 
     const [revenusRows] = await pool.query(
@@ -263,5 +281,26 @@ export async function PUT(res: Request) {
       "UPDATE project SET total_revenus = ?, total_depenses = ?, benefice = ?, rentabilite = ? WHERE id_project = ?",
       [total_revenus, total_depenses, benefice, rentabilite, id_project],
     );
-  } catch (error) {}
+
+    const normalizedDate = String(date).split("T")[0];
+
+    return NextResponse.json(
+      {
+        message: "Transaction modifiée avec succès !",
+        stats: { total_revenus, total_depenses, benefice, rentabilite },
+        transaction: {
+          id_transaction,
+          description,
+          type,
+          date: normalizedDate,
+          montant: Number(montant),
+          category_name,
+        },
+      },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.error("TRANSACTION_PUT_ERROR", error);
+    return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
+  }
 }

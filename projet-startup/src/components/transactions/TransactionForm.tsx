@@ -45,31 +45,18 @@ export default function TransactionForm({
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+
     const method = transaction ? "PUT" : "POST";
     const url = transaction
       ? `/api/transaction?id_transaction=${transaction.id_transaction}`
       : "/api/transaction";
 
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        description,
-        type,
-        date,
-        montant,
-        category_name,
-        id_project: projectId,
-      }),
-    });
-
-    e.preventDefault();
-    setError(null);
-    setSubmitting(true);
-
     try {
-      const res = await fetch("/api/transaction", {
-        method: "POST",
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           description,
@@ -84,7 +71,7 @@ export default function TransactionForm({
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Erreur lors de la création.");
+        setError(data.message || "Erreur lors de la sauvegarde.");
         return;
       }
 
