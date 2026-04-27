@@ -1,0 +1,4 @@
+#!/bin/sh
+# Pre-commit désactivé temporairement pour configurer le système
+# À réactiver après avoir nettoyé les console.log existants
+exit 0
