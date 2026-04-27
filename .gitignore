@@ -1,0 +1,4 @@
+
+# Dependencies à la racine
+node_modules/
+.DS_Store
