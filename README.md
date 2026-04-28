@@ -205,6 +205,79 @@ npm run db:seed          # Données de test
 
 ---
 
+## 🐳 Docker
+
+### Démarrage rapide
+
+**Prérequis :** Docker Desktop (ou Docker Engine + plugin Compose).
+
+```bash
+# 1. Cloner le dépôt
+git clone https://github.com/madebyjhn/Projet-Bachelor.git
+cd Projet-Bachelor
+
+# 2. Créer le fichier d'environnement
+cp .env.example .env
+# Éditer .env : remplir DB_PASSWORD, MYSQL_ROOT_PASSWORD, JWT_SECRET, SMTP_*
+
+# 3. Démarrer tous les services
+make up
+# Équivalent : docker compose up -d
+
+# 4. Ouvrir l'application
+open http://localhost:3000
+```
+
+### Commandes disponibles
+
+```bash
+make up      # Démarrer tous les services en arrière-plan
+make down    # Arrêter les services (données conservées)
+make build   # Reconstruire l'image depuis zéro
+make logs    # Suivre les logs en temps réel
+make ps      # Lister les conteneurs en cours
+make clean   # Arrêter et supprimer les volumes (⚠️ perte de données)
+make scan    # Scanner l'image avec Trivy (nécessite trivy installé)
+```
+
+### Convention de tagging
+
+Les images sont publiées sur `ghcr.io/madebyjhn/projet-bachelor`.
+
+| Tag | Exemple | Produit lors de |
+|---|---|---|
+| `{major}.{minor}.{patch}` | `1.2.3` | Push du tag git `v1.2.3` |
+| `{major}.{minor}` | `1.2` | Push du tag git `v1.2.3` |
+| `{major}` | `1` | Push du tag git `v1.2.3` |
+| `sha-{hash}` | `sha-a1b2c3d` | Chaque push sur `main` ou tag |
+| `latest` | `latest` | Chaque push sur `main` uniquement |
+
+Pour publier une nouvelle version :
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+# → GitHub Actions construit, pousse, et scanne avec Trivy automatiquement
+```
+
+### Variables d'environnement
+
+| Variable | Description | Exemple |
+|---|---|---|
+| `DB_HOST` | Hôte MySQL (doit être `mysql` en Docker) | `mysql` |
+| `DB_USER` | Utilisateur MySQL | `startuplab` |
+| `DB_PASSWORD` | Mot de passe MySQL | `strong_password` |
+| `DB_DATABASE` | Nom de la base de données | `startuplab` |
+| `MYSQL_ROOT_PASSWORD` | Mot de passe root MySQL | `root_password` |
+| `JWT_SECRET` | Clé de signature JWT (≥ 32 caractères) | `openssl rand -base64 32` |
+| `SMTP_HOST` | Serveur SMTP | `smtp.gmail.com` |
+| `SMTP_PORT` | Port SMTP | `587` |
+| `SMTP_USER` | Email SMTP | `user@gmail.com` |
+| `SMTP_PASS` | Mot de passe SMTP / app password | `app_password` |
+| `NEXT_PUBLIC_APP_URL` | URL publique de l'application | `http://localhost:3000` |
+
+---
+
 ## 🤝 Contribution
 
 Les contributions sont les bienvenues ! Veuillez consulter [CONTRIBUTING.md](./CONTRIBUTING.md) pour :

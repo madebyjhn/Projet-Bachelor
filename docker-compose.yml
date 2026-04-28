@@ -1,0 +1,76 @@
+# =============================================================
+# StartupLab – Docker Compose
+# Usage : cp .env.example .env && docker compose up -d
+# =============================================================
+
+name: startuplab
+
+services:
+
+  # ------------------------------------------------------------
+  # Next.js application
+  # ------------------------------------------------------------
+  app:
+    build:
+      context: ./projet-startup
+      dockerfile: Dockerfile
+    image: ghcr.io/madebyjhn/projet-bachelor:local
+    ports:
+      - "3000:3000"
+    env_file: .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ------------------------------------------------------------
+  # MySQL 8.4 – aucun port exposé vers l'hôte
+  # ------------------------------------------------------------
+  mysql:
+    image: mysql:8.4.5
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      start_period: 40s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  mysql_data:
+    name: startuplab_mysql_data
