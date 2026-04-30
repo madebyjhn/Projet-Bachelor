@@ -1,7 +1,37 @@
 @import "tailwindcss";
 
+@variant dark (&:is(.dark *));
+
+:root {
+  --bg: #e8e8e8;
+  --card-bg: #f0f0f0;
+  --input-bg: #e0e0e0;
+  --border: #cccccc;
+  --text: #1a1a1a;
+  --text-muted: #6b7280;
+  --neu-dark: #c5c5c5;
+  --neu-light: #ffffff;
+  --neu-sm-dark: #b8b8b8;
+  --neu-sm-light: #ffffff;
+}
+
+.dark {
+  --bg: #1e2235;
+  --card-bg: #262c42;
+  --input-bg: #1a1f30;
+  --border: #2e3550;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --neu-dark: #161a29;
+  --neu-light: #303756;
+  --neu-sm-dark: #161a29;
+  --neu-sm-light: #303756;
+}
+
 @layer base {
   body {
+    background-color: var(--bg);
+    color: var(--text);
     font-family:
       "Inter",
       -apple-system,
@@ -19,6 +49,7 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
 
 @layer utilities {
   .animate-fade-in {

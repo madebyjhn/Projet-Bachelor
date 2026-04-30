@@ -86,3 +86,35 @@ export async function PUT(req: Request) {
     return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
   }
 }
+export async function DELETE() {
+  try {
+    const id_user = await authenticate();
+    if (!id_user) {
+      return NextResponse.json(
+        { message: "Session invalide" },
+        { status: 401 },
+      );
+    }
+
+    await pool.query("DELETE FROM `transaction` WHERE id_user = ?", [id_user]);
+    await pool.query("DELETE FROM project WHERE id_user = ?", [id_user]);
+    await pool.query("DELETE FROM category WHERE id_user = ?", [id_user]);
+
+    const [rows] = await pool.query<ResultSetHeader>(
+      "DELETE FROM user WHERE id_user = ?",
+      [id_user],
+    );
+
+    if (rows.affectedRows === 0) {
+      return NextResponse.json(
+        { message: "Aucun utilisateur trouvé" },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json({ message: "Compte supprimé" }, { status: 200 });
+  } catch (error) {
+    console.error("USER_DELETE_ERROR", error);
+    return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
+  }
+}

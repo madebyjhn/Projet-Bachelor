@@ -30,12 +30,19 @@ export default function SideBar({
     return pathname === href;
   };
 
+  const linkBase =
+    "w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200";
+  const linkActive =
+    "text-white text-lg bg-linear-to-r from-violet-500 to-violet-600";
+  const linkInactive =
+    "text-(--text) hover:bg-violet-500/10 hover:text-violet-500";
+
   return (
     <aside
       className={`
-        fixed top-20 left-0 h-[calc(100vh-5rem)] z-40 w-80 bg-gradient-to-b from-gray-50 to-gray-100
-        border-r-2 border-gray-200 p-4 lg:p-6 shadow-[2px_0_8px_rgba(0,0,0,0.05)] overflow-y-auto
-        transition-transform duration-300 ease-in-out
+        fixed top-20 left-0 h-[calc(100vh-5rem)] z-40 w-80
+        bg-(--bg) border-r-2 border-(--border)
+        p-4 lg:p-6 overflow-y-auto transition-all duration-300 ease-in-out
         lg:sticky lg:top-20 lg:self-start lg:h-[calc(100vh-5rem)] lg:translate-x-0 lg:z-30
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
       `}
@@ -46,28 +53,22 @@ export default function SideBar({
         <nav className="space-y-3">
           <button
             type="button"
-            className={[
-              "w-full rounded-xl font-medium transition-all duration-300 ease-out active:scale-95 transform hover:-translate-y-0.5 group relative overflow-hidden ",
-
-              "bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-[4px_4px_8px_#b8b8b8,-4px_-4px_8px_#ffffff] hover:shadow-[6px_6px_12px_#b8b8b8,-6px_-6px_12px_#ffffff] hover:from-violet-600 hover:to-purple-700",
-
-              "flex items-center justify-center gap-3 py-4 px-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200",
-            ].join(" ")}
+            className="w-full rounded-xl font-semibold transition-all duration-300 ease-out active:scale-95 transform hover:-translate-y-0.5 group relative overflow-hidden bg-linear-to-r from-violet-500 to-purple-600 text-white flex items-center justify-center gap-3 py-4 px-6 text-lg shadow-[4px_4px_8px_var(--neu-sm-dark),-4px_-4px_8px_var(--neu-sm-light)] hover:shadow-[6px_6px_12px_var(--neu-sm-dark),-6px_-6px_12px_var(--neu-sm-light)] hover:from-violet-600 hover:to-purple-700"
             onClick={() => {
               onAddTransaction();
               onClose?.();
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-all duration-700" />
+            <div className="absolute inset-0 bg-linear-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-all duration-700" />
             <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
             <span>
               Ajouter <br /> Transaction
             </span>
           </button>
 
-          <NeumorphicCard padding="md" className="bg-white ">
+          <NeumorphicCard padding="md">
             <div className="mb-3">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
+              <h3 className="text-xs font-semibold text-(--text-muted) uppercase tracking-wider mb-4">
                 🧭 Navigation
               </h3>
             </div>
@@ -75,7 +76,7 @@ export default function SideBar({
               <Link
                 href={`/dashboard/${projectId}`}
                 onClick={onClose}
-                className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 ${isDashboardActive ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
+                className={`${linkBase} ${isDashboardActive ? linkActive : linkInactive}`}
               >
                 <House /> <span>Dashboard</span>
               </Link>
@@ -84,7 +85,7 @@ export default function SideBar({
               <Link
                 href={`/dashboard/${projectId}/projets`}
                 onClick={onClose}
-                className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/projets`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
+                className={`${linkBase} ${isActive(`/dashboard/${projectId}/projets`) ? linkActive : linkInactive}`}
               >
                 <FolderOpen /> <span>Projets</span>
               </Link>
@@ -93,7 +94,7 @@ export default function SideBar({
               <Link
                 href={`/dashboard/${projectId}/transactions`}
                 onClick={onClose}
-                className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/transactions`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
+                className={`${linkBase} ${isActive(`/dashboard/${projectId}/transactions`) ? linkActive : linkInactive}`}
               >
                 <CreditCard /> <span>Transactions</span>
               </Link>
@@ -102,7 +103,7 @@ export default function SideBar({
               <Link
                 href={`/dashboard/${projectId}/rapports`}
                 onClick={onClose}
-                className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/rapports`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
+                className={`${linkBase} ${isActive(`/dashboard/${projectId}/rapports`) ? linkActive : linkInactive}`}
               >
                 <ChartColumn /> <span>Rapports</span>
               </Link>
@@ -111,7 +112,7 @@ export default function SideBar({
               <Link
                 href={`/dashboard/${projectId}/settings`}
                 onClick={onClose}
-                className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/parametres`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
+                className={`${linkBase} ${isActive(`/dashboard/${projectId}/parametres`) ? linkActive : linkInactive}`}
               >
                 <Settings /> <span>Paramètres</span>
               </Link>

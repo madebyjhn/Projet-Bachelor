@@ -6,7 +6,8 @@ import TopBar from "../../../../components/layout/TopBar";
 import SideBar from "../../../../components/layout/SideBar";
 import TransactionForm from "../../../../components/transactions/TransactionForm";
 import { NeumorphicCard } from "../../../../components/ui/NeumorphicCard";
-import { User, Save } from "lucide-react";
+import { NeumorphicButton } from "../../../../components/ui/NeumorphicButton";
+import { User, Save, Mail } from "lucide-react";
 
 type User = {
   nom_complet: string;
@@ -21,6 +22,7 @@ export default function Projets() {
   const [nomComplet, setNomComplet] = useState("");
   const [email, setEmail] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const params = useParams<{ projectId: string | string[] }>();
   const projectIdRaw = Array.isArray(params.projectId)
@@ -48,6 +50,17 @@ export default function Projets() {
     setUser((prev) =>
       prev ? { ...prev, nom_complet: nomComplet, email } : prev,
     );
+  };
+
+  const handleDelete = async () => {
+    const res = await fetch("/api/user", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (res.ok) {
+      await fetch("/api/auth/logout", { method: "POST" });
+      window.location.href = "/auth";
+    }
   };
 
   if (!Number.isFinite(projectId) || !user) return null;
@@ -83,7 +96,7 @@ export default function Projets() {
               </div>
               <div className="pl-4">
                 <h2 className="text-xl font-bold">Informations du profil</h2>
-                <p className="text-s text-gray-600">
+                <p className="text-s text-(--text-muted)">
                   Gérez vos informations personnelles
                 </p>
               </div>
@@ -91,40 +104,81 @@ export default function Projets() {
             {/* Formulaire */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2 mt-4">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-(--text)">
                   Nom complet <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={nomComplet}
                   onChange={(e) => setNomComplet(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 rounded-xl border-none outline-none shadow-[inset_4px_4px_8px_#b8b8b8,inset_-4px_-4px_8px_#ffffff] focus:shadow-[inset_6px_6px_12px_#b8b8b8,inset_-6px_-6px_12px_#ffffff] transition-shadow text-gray-700"
+                  className="w-full px-4 py-3 bg-(--input-bg) text-(--text) rounded-xl border-none outline-none shadow-[inset_4px_4px_8px_var(--neu-sm-dark),inset_-4px_-4px_8px_var(--neu-sm-light)] focus:shadow-[inset_6px_6px_12px_var(--neu-sm-dark),inset_-6px_-6px_12px_var(--neu-sm-light)] transition-shadow"
                 />
               </div>
               <div className="space-y-2 mt-4">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-(--text)">
                   Email <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 rounded-xl border-none outline-none shadow-[inset_4px_4px_8px_#b8b8b8,inset_-4px_-4px_8px_#ffffff] focus:shadow-[inset_6px_6px_12px_#b8b8b8,inset_-6px_-6px_12px_#ffffff] transition-shadow text-gray-700"
+                  className="w-full px-4 py-3 bg-(--input-bg) text-(--text) rounded-xl border-none outline-none shadow-[inset_4px_4px_8px_var(--neu-sm-dark),inset_-4px_-4px_8px_var(--neu-sm-light)] focus:shadow-[inset_6px_6px_12px_var(--neu-sm-dark),inset_-6px_-6px_12px_var(--neu-sm-light)] transition-shadow"
                 />
               </div>
             </div>
             {/* Bouton de sauvegarde */}
-            <button
-              className="flex flex-row py-3 px-6 mt-4 bg-gradient-to-r from-violet-500 to-purple-600 shadow-[4px_4px_8px_#b8b8b8,-4px_-4px_8px_#ffffff] hover:shadow-[6px_6px_12px_#b8b8b8,-6px_-6px_12px_#ffffff] hover:from-violet-600 hover:to-purple-700 rounded-xl text-white justify-center items-center space-x-2 transition-all duration-300 ease-out active:scale-95 transform hover:-translate-y-0.5 group relative overflow-hidden"
+            <NeumorphicButton
+              className="mt-4"
+              icon={<Save className="w-4 h-4" />}
               onClick={() => setConfirmOpen(true)}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-all duration-700"></div>
-              <Save className="w-4 h-4" />
-              <span className="">Sauvegarder</span>
-            </button>
+              Sauvegarder
+            </NeumorphicButton>
+          </NeumorphicCard>
+
+          {/* Données et suppression de compte */}
+          <NeumorphicCard className="p-4">
+            <div className="flex flex-row items-center gap-4">
+              <div className="flex justify-center items-center w-10 h-10 bg-linear-to-br from-red-200 to-red-300 rounded-xl">
+                <Mail className="text-red-500" />
+              </div>
+
+              <div className="">
+                <h2 className="text-xl font-bold">Données et sécurité</h2>
+                <p className="text-s text-(--text-muted)">Gérez vos données</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <NeumorphicButton
+                className="text-black tracking-wide font-medium"
+                color="white"
+              >
+                Exporter mes données
+              </NeumorphicButton>
+              <NeumorphicButton
+                className="tracking-wide font-medium"
+                color="red"
+                onClick={() => setDeleteConfirmOpen(true)}
+              >
+                Supprimer mon compte
+              </NeumorphicButton>
+            </div>
+            <div className="pt-8 text-xs text-(--text-muted) p-4 mt-4">
+              <p className="mb-2">
+                <strong>Note sur la confidentialité:</strong> Toutes vos données
+                sont stockées localement dans votre navigateur. Aucune
+                information n&apos;est envoyée vers des serveurs externes.
+              </p>
+              <p>
+                Pour sauvegarder vos données, utilisez la fonction
+                d&apos;export. Pour transférer vos données vers un autre
+                appareil, exportez puis importez le fichier de sauvegarde.
+              </p>
+            </div>
           </NeumorphicCard>
         </main>
       </div>
+      {/* Ajout de transaction */}
       {openTransaction && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
@@ -139,38 +193,74 @@ export default function Projets() {
           </div>
         </div>
       )}
-
+      {/* Confirmation des modifications */}
       {confirmOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           onClick={() => setConfirmOpen(false)}
         >
           <div
-            className="bg-gray-100 rounded-2xl p-6 shadow-[8px_8px_16px_#b8b8b8,-8px_-8px_16px_#ffffff] w-full max-w-sm space-y-4"
+            className="bg-(--card-bg) rounded-2xl p-6 shadow-[8px_8px_16px_var(--neu-dark),-8px_-8px_16px_var(--neu-light)] w-full max-w-sm space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-bold text-gray-800">
+            <h3 className="text-lg font-bold text-(--text)">
               Confirmer les modifications
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-(--text-muted)">
               Êtes-vous sûr de vouloir sauvegarder ces changements ?
             </p>
             <div className="flex gap-3 justify-end">
-              <button
+              <NeumorphicButton
+                variant="secondary"
                 onClick={() => setConfirmOpen(false)}
-                className="px-4 py-2 rounded-xl text-gray-600 shadow-[4px_4px_8px_#b8b8b8,-4px_-4px_8px_#ffffff] hover:shadow-[6px_6px_12px_#b8b8b8,-6px_-6px_12px_#ffffff] transition-all"
               >
                 Annuler
-              </button>
-              <button
+              </NeumorphicButton>
+              <NeumorphicButton
                 onClick={() => {
                   handleEdit();
                   setConfirmOpen(false);
                 }}
-                className="px-4 py-2 rounded-xl text-white bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 transition-all"
               >
                 Confirmer
-              </button>
+              </NeumorphicButton>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Confirmation de suppression de compte */}
+      {deleteConfirmOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setDeleteConfirmOpen(false)}
+        >
+          <div
+            className="bg-(--card-bg) rounded-2xl p-6 shadow-[8px_8px_16px_var(--neu-dark),-8px_-8px_16px_var(--neu-light)] w-full max-w-sm space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold text-red-500">
+              Supprimer le compte
+            </h3>
+            <p className="text-sm text-(--text-muted)">
+              Cette action est irréversible. Toutes vos données seront
+              définitivement supprimées.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <NeumorphicButton
+                variant="secondary"
+                onClick={() => setDeleteConfirmOpen(false)}
+              >
+                Annuler
+              </NeumorphicButton>
+              <NeumorphicButton
+                color="red"
+                onClick={() => {
+                  handleDelete();
+                  setDeleteConfirmOpen(false);
+                }}
+              >
+                Supprimer définitivement
+              </NeumorphicButton>
             </div>
           </div>
         </div>
