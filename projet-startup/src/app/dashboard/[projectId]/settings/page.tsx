@@ -20,6 +20,7 @@ export default function Projets() {
   const [user, setUser] = useState<User | null>(null);
   const [nomComplet, setNomComplet] = useState("");
   const [email, setEmail] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const params = useParams<{ projectId: string | string[] }>();
   const projectIdRaw = Array.isArray(params.projectId)
@@ -115,7 +116,7 @@ export default function Projets() {
             {/* Bouton de sauvegarde */}
             <button
               className="flex flex-row py-3 px-6 mt-4 bg-gradient-to-r from-violet-500 to-purple-600 shadow-[4px_4px_8px_#b8b8b8,-4px_-4px_8px_#ffffff] hover:shadow-[6px_6px_12px_#b8b8b8,-6px_-6px_12px_#ffffff] hover:from-violet-600 hover:to-purple-700 rounded-xl text-white justify-center items-center space-x-2 transition-all duration-300 ease-out active:scale-95 transform hover:-translate-y-0.5 group relative overflow-hidden"
-              onClick={handleEdit}
+              onClick={() => setConfirmOpen(true)}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-all duration-700"></div>
               <Save className="w-4 h-4" />
@@ -135,6 +136,42 @@ export default function Projets() {
               onSuccess={() => setOpenTransaction(false)}
               projectId={projectId}
             />
+          </div>
+        </div>
+      )}
+
+      {confirmOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setConfirmOpen(false)}
+        >
+          <div
+            className="bg-gray-100 rounded-2xl p-6 shadow-[8px_8px_16px_#b8b8b8,-8px_-8px_16px_#ffffff] w-full max-w-sm space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold text-gray-800">
+              Confirmer les modifications
+            </h3>
+            <p className="text-sm text-gray-600">
+              Êtes-vous sûr de vouloir sauvegarder ces changements ?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setConfirmOpen(false)}
+                className="px-4 py-2 rounded-xl text-gray-600 shadow-[4px_4px_8px_#b8b8b8,-4px_-4px_8px_#ffffff] hover:shadow-[6px_6px_12px_#b8b8b8,-6px_-6px_12px_#ffffff] transition-all"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => {
+                  handleEdit();
+                  setConfirmOpen(false);
+                }}
+                className="px-4 py-2 rounded-xl text-white bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 transition-all"
+              >
+                Confirmer
+              </button>
+            </div>
           </div>
         </div>
       )}
