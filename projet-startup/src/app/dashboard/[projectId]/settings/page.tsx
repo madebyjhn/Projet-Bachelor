@@ -38,6 +38,17 @@ export default function Projets() {
       .catch(console.error);
   }, []);
 
+  const handleEdit = async () => {
+    fetch("/api/user", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nom_complet: nomComplet, email }),
+    });
+    setUser((prev) =>
+      prev ? { ...prev, nom_complet: nomComplet, email } : prev,
+    );
+  };
+
   if (!Number.isFinite(projectId) || !user) return null;
 
   return (
@@ -102,7 +113,10 @@ export default function Projets() {
               </div>
             </div>
             {/* Bouton de sauvegarde */}
-            <button className="flex flex-row py-3 px-6 mt-4 bg-gradient-to-r from-violet-500 to-purple-600 shadow-[4px_4px_8px_#b8b8b8,-4px_-4px_8px_#ffffff] hover:shadow-[6px_6px_12px_#b8b8b8,-6px_-6px_12px_#ffffff] hover:from-violet-600 hover:to-purple-700 rounded-xl text-white justify-center items-center space-x-2 transition-all duration-300 ease-out active:scale-95 transform hover:-translate-y-0.5 group relative overflow-hidden">
+            <button
+              className="flex flex-row py-3 px-6 mt-4 bg-gradient-to-r from-violet-500 to-purple-600 shadow-[4px_4px_8px_#b8b8b8,-4px_-4px_8px_#ffffff] hover:shadow-[6px_6px_12px_#b8b8b8,-6px_-6px_12px_#ffffff] hover:from-violet-600 hover:to-purple-700 rounded-xl text-white justify-center items-center space-x-2 transition-all duration-300 ease-out active:scale-95 transform hover:-translate-y-0.5 group relative overflow-hidden"
+              onClick={handleEdit}
+            >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-all duration-700"></div>
               <Save className="w-4 h-4" />
               <span className="">Sauvegarder</span>
