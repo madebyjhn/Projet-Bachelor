@@ -2,6 +2,7 @@ import { pool } from "../../../../lib/db";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { SignJWT } from "jose";
+import { RowDataPacket } from "mysql2";
 
 export async function POST(req: Request) {
   try {
@@ -15,7 +16,7 @@ export async function POST(req: Request) {
     }
 
     const [rows] = await pool.query<
-      { id_user: number; password: string; active: number }[]
+      (RowDataPacket & { id_user: number; password: string; active: number })[]
     >("SELECT id_user, password, active FROM `user` WHERE email = ? LIMIT 1", [
       email,
     ]);

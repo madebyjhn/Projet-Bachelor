@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { pool } from "../../../../lib/db";
-import { jwtVerify } from "jose";
-import Dashboard from "../../../dashboard/page";
+import { RowDataPacket } from "mysql2";
 
 export async function GET(req: Request) {
   try {
@@ -12,7 +11,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Token manquant" }, { status: 400 });
     }
 
-    const [rows] = await pool.query<{ id_user: number }[]>(
+    const [rows] = await pool.query<(RowDataPacket & { id_user: number })[]>(
       "SELECT id_user FROM `user` WHERE verification_token = ? AND verification_expires > NOW() LIMIT 1;",
       [token],
     );

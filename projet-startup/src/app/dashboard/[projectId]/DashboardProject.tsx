@@ -7,8 +7,6 @@ import TopBar from "../../../components/layout/TopBar";
 import { NeumorphicCard } from "../../../components/ui/NeumorphicCard";
 import { TrendingUp, TrendingDown, HandCoins, Percent } from "lucide-react";
 import { LineChart, PieChart } from "@mui/x-charts";
-import { log } from "../../../../node_modules/handlebars/types/index.d";
-import height from "../../../../node_modules/dom-helpers/cjs/height.d";
 
 type Project = {
   name: string;
@@ -109,11 +107,13 @@ export default function Dashboard({
   const [transactions, setTransactions] =
     useState<Transaction[]>(initialTransactions);
 
-  const handleTransactionSuccess = (newStats: Stats, newTx: Transaction) => {
+  const handleTransactionSuccess = (newStats: Stats, newTx?: Transaction) => {
     setStats(newStats);
-    setTransactions((prev) =>
-      [...prev, newTx].sort((a, b) => a.date.localeCompare(b.date)),
-    );
+    if (newTx) {
+      setTransactions((prev) =>
+        [...prev, newTx].sort((a, b) => a.date.localeCompare(b.date)),
+      );
+    }
     fetchCategoryStats();
     setOpenTransaction(false);
   };
@@ -302,13 +302,13 @@ export default function Dashboard({
                         return `${item.label} ${((item.value / total) * 100).toFixed(1)}%`;
                       },
                       arcLabelMinAngle: 10,
-                      labelRadius: 160,
+                      arcLabelRadius: 160,
                       outerRadius: 110,
                     },
                   ]}
                   height={320}
                   margin={{ top: 40, bottom: 40, left: 80, right: 80 }}
-                  slotProps={{ legend: { hidden: true } }}
+                  slots={{ legend: () => null }}
                   sx={{
                     "& .MuiPieArcLabel-root": {
                       fontWeight: 600,

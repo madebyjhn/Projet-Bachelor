@@ -25,7 +25,7 @@ export async function GET() {
       [id_user],
     );
 
-    if (rows.length === 0) {
+    if ((rows as unknown[]).length === 0) {
       return NextResponse.json(
         { message: "Categorie introuvable" },
         { status: 404 },

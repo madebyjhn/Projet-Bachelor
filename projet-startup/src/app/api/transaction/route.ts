@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import { pool } from "@/lib/db";
+import { RowDataPacket, ResultSetHeader } from "mysql2";
 
 async function authenticate() {
   const cookieStore = await cookies();
@@ -31,7 +32,7 @@ export async function POST(req: Request) {
         { status: 400 },
       );
 
-    const [rows] = await pool.query(
+    const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT id_project FROM project WHERE id_user = ? AND id_project = ? LIMIT 1",
       [id_user, id_project],
     );
@@ -44,13 +45,13 @@ export async function POST(req: Request) {
     }
 
     let id_category = 0;
-    const [category] = await pool.query(
+    const [category] = await pool.query<(RowDataPacket & { id_category: number })[]>(
       "SELECT id_category FROM category WHERE nom = ? AND id_user = ?",
       [category_name, id_user],
     );
 
     if (category.length === 0) {
-      const [inst] = await pool.query(
+      const [inst] = await pool.query<ResultSetHeader>(
         "INSERT INTO category (nom, id_user) VALUES (?, ?)",
         [category_name, id_user],
       );
@@ -64,11 +65,11 @@ export async function POST(req: Request) {
       [description, type, date, montant, id_project, id_category, id_user],
     );
 
-    const [revenusRows] = await pool.query(
+    const [revenusRows] = await pool.query<(RowDataPacket & { total: number })[]>(
       "SELECT COALESCE(SUM(montant), 0) AS total FROM `transaction` WHERE id_project = ? AND type = 'income'",
       [id_project],
     );
-    const [depensesRows] = await pool.query(
+    const [depensesRows] = await pool.query<(RowDataPacket & { total: number })[]>(
       "SELECT COALESCE(SUM(montant), 0) AS total FROM `transaction` WHERE id_project = ? AND type = 'expense'",
       [id_project],
     );

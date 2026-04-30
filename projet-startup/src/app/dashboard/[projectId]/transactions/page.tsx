@@ -81,7 +81,7 @@ export default function TransactionPage() {
 
   if (!Number.isFinite(projectId) || !user) return null;
 
-  const handleDeleteTransaction = (id_transaction) => {
+  const handleDeleteTransaction = (id_transaction: number) => {
     fetch(`/api/transaction?id_transaction=${id_transaction}`, {
       method: "DELETE",
     }).then(() => {

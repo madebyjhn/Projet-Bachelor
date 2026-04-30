@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       "SELECT id_user FROM user WHERE email = ?",
       [email],
     );
-    if (rows.length > 0) {
+    if ((rows as unknown[]).length > 0) {
       return NextResponse.json({ message: "email existant" }, { status: 400 });
     }
 

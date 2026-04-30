@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import TopBar from "../../../../components/layout/TopBar";
 import SideBar from "../../../../components/layout/SideBar";
-import TransactionForm from "../transactions/page";
+import TransactionForm from "../../../../components/transactions/TransactionForm";
 
 type User = {
   nom_complet: string;
@@ -62,6 +62,7 @@ export default function Projets() {
           <div className="w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
             <TransactionForm
               onClose={() => setOpenTransaction(false)}
+              onSuccess={() => setOpenTransaction(false)}
               projectId={projectId}
             />
           </div>

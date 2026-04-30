@@ -109,7 +109,7 @@ export default function SideBar({
             </div>
             <div className="flex justify-between mt-1">
               <Link
-                href={`/dashboard/${projectId}/parametres`}
+                href={`/dashboard/${projectId}/settings`}
                 onClick={onClose}
                 className={`w-full flex items-center space-x-4 font-semibold rounded-xl px-5 py-4 transition-all duration-200 ${isActive(`/dashboard/${projectId}/parametres`) ? "text-white text-lg bg-gradient-to-r from-violet-500 to-violet-600" : "text-gray-700 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 hover:shadow-[4px_4px_8px_rgba(139,92,246,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)] hover:text-violet-500"}`}
               >
