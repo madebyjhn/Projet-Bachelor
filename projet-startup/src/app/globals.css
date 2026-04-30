@@ -16,16 +16,16 @@
 }
 
 .dark {
-  --bg: #1e2235;
-  --card-bg: #262c42;
-  --input-bg: #1a1f30;
-  --border: #2e3550;
+  --bg: #1c2033;
+  --card-bg: #2a3050;
+  --input-bg: #161929;
+  --border: #3a4268;
   --text: #e2e8f0;
-  --text-muted: #94a3b8;
-  --neu-dark: #161a29;
-  --neu-light: #303756;
-  --neu-sm-dark: #161a29;
-  --neu-sm-light: #303756;
+  --text-muted: #8892aa;
+  --neu-dark: #10131f;
+  --neu-light: #3e4870;
+  --neu-sm-dark: #10131f;
+  --neu-sm-light: #3e4870;
 }
 
 @layer base {

@@ -6,7 +6,8 @@ import TopBar from "../../../../components/layout/TopBar";
 import SideBar from "../../../../components/layout/SideBar";
 import TransactionForm from "../../../../components/transactions/TransactionForm";
 import { NeumorphicButton } from "@/components/ui/NeumorphicButton";
-import { Plus } from "lucide-react";
+import { Plus, FolderOpen } from "lucide-react";
+import { NeumorphicCard } from "@/components/ui/NeumorphicCard";
 
 type User = {
   nom_complet: string;
@@ -85,7 +86,38 @@ export default function Projets() {
 
           {/* CRUD des projets */}
           {project.map((p, i) => (
-            <div key={i}></div>
+            <NeumorphicCard
+              key={i}
+              className="p-6 border-2 border-violet-500 w-1/3 rounded-2xl"
+            >
+              <div className="flex flex-row items-center space-y-1 gap-4 pl-4">
+                <div className="">
+                  <FolderOpen className="text-violet-500 w-5 h-5" />
+                </div>
+                <div className="">
+                  <h2 className="font-bold">{p.name}</h2>
+                  <p className="text-sm text-gray-500">{p.description}</p>
+                </div>
+              </div>
+              <div className="pt-4 space-y-3">
+                <div className="flex flew-rows justify-between">
+                  <p className="text-sm text-gray-500">Bénéfice</p>
+                  <p
+                    className={`font-bold ${p.benefice > 0 ? `text-green-600` : `text-red-500`}`}
+                  >
+                    {p.benefice} €{" "}
+                  </p>
+                </div>
+                <div className="flex flew-rows justify-between">
+                  <p className="text-sm text-gray-500">Revenus</p>
+                  <p className="">{p.total_revenus}</p>
+                </div>
+                <div className="flex flew-rows justify-between">
+                  <p className="text-sm text-gray-500">Dépenses</p>
+                  <p className="">{p.total_depenses}</p>
+                </div>
+              </div>
+            </NeumorphicCard>
           ))}
         </main>
       </div>
