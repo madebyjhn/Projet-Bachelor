@@ -33,7 +33,8 @@ export async function POST(req: Request) {
       [name, email, hashedPassword, verifToken],
     );
 
-    const link = `http://localhost:3000/api/auth/verify?token=${verifToken}`;
+    const baseUrl = new URL(req.url).origin;
+    const link = `${baseUrl}/api/auth/verify?token=${verifToken}`;
 
     return NextResponse.json(
       { message: "Compte créé", verifyLink: link },
