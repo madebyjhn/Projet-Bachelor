@@ -8,6 +8,7 @@ import {
   FolderOpen,
   ChartColumn,
   Settings,
+  ScrollText,
 } from "lucide-react";
 import { NeumorphicCard } from "../ui/NeumorphicCard";
 
@@ -106,6 +107,15 @@ export default function SideBar({
                 className={`${linkBase} ${isActive(`/dashboard/${projectId}/rapports`) ? linkActive : linkInactive}`}
               >
                 <ChartColumn /> <span>Rapports</span>
+              </Link>
+            </div>
+            <div className="flex justify-between mt-1">
+              <Link
+                href={`/dashboard/${projectId}/logs`}
+                onClick={onClose}
+                className={`${linkBase} ${isActive(`/dashboard/${projectId}/logs`) ? linkActive : linkInactive}`}
+              >
+                <ScrollText /> <span>Journal</span>
               </Link>
             </div>
             <div className="flex justify-between mt-1">

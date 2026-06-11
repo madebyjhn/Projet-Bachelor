@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { SignJWT } from "jose";
 import { RowDataPacket } from "mysql2";
+import { logActivity } from "../../../../lib/activityLog";
 
 export async function POST(req: Request) {
   try {
@@ -22,6 +23,7 @@ export async function POST(req: Request) {
     ]);
 
     if (rows.length === 0) {
+      logActivity(null, "LOGIN_FAILED", "auth", { email });
       return NextResponse.json(
         { message: "Identifiants invalides" },
         { status: 401 },
@@ -33,6 +35,7 @@ export async function POST(req: Request) {
     const ok = await bcrypt.compare(password, user.password);
 
     if (!ok) {
+      logActivity(user.id_user, "LOGIN_FAILED", "auth", { email });
       return NextResponse.json(
         { message: "Identifiants invalides" },
         { status: 401 },
@@ -40,6 +43,8 @@ export async function POST(req: Request) {
     } else if (user.active === 0) {
       return NextResponse.json({ message: "Compte inactif" }, { status: 403 });
     }
+
+    logActivity(user.id_user, "LOGIN_SUCCESS", "auth", { email });
 
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const res = NextResponse.json({ message: "Connexion OK" }, { status: 200 });

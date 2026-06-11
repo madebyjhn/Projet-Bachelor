@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import { pool } from "@/lib/db";
 import { RowDataPacket, ResultSetHeader } from "mysql2";
+import { logActivity } from "@/lib/activityLog";
 
 async function authenticate() {
   const cookieStore = await cookies();
@@ -64,6 +65,13 @@ export async function POST(req: Request) {
       "INSERT INTO `transaction` (description, type, date, montant, id_project, id_category, id_user) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [description, type, date, montant, id_project, id_category, id_user],
     );
+
+    logActivity(id_user, "TRANSACTION_CREATED", "transaction", {
+      type,
+      montant: Number(montant),
+      id_project,
+      category: category_name,
+    });
 
     const [revenusRows] = await pool.query<(RowDataPacket & { total: number })[]>(
       "SELECT COALESCE(SUM(montant), 0) AS total FROM `transaction` WHERE id_project = ? AND type = 'income'",
@@ -174,6 +182,10 @@ export async function DELETE(req: Request) {
       [id_user, id_transaction],
     );
 
+    logActivity(id_user, "TRANSACTION_DELETED", "transaction", {
+      id_transaction,
+    });
+
     const [revenusRows] = await pool.query(
       "SELECT COALESCE(SUM(montant), 0) AS total FROM `transaction` WHERE id_project = ? AND type = 'income'",
       [id_project],
@@ -260,6 +272,13 @@ export async function PUT(req: Request) {
       "UPDATE `transaction` SET description = ?, type = ?, date = ?, montant = ?, id_category = ? WHERE id_transaction = ? AND id_user = ?",
       [description, type, date, montant, id_category, id_transaction, id_user],
     );
+
+    logActivity(id_user, "TRANSACTION_UPDATED", "transaction", {
+      id_transaction,
+      type,
+      montant: Number(montant),
+      category: category_name,
+    });
 
     const [revenusRows] = await pool.query(
       "SELECT COALESCE(SUM(montant), 0) AS total FROM `transaction` WHERE id_project = ? AND type = 'income'",
