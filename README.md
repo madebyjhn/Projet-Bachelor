@@ -38,7 +38,6 @@ Ce projet fait partie d'un **dossier professionnel Bachelor** et démontre :
 - **MySQL** (via XAMPP)
 - **mysql2** (driver Node.js)
 - **JWT** (authentification via `jose`)
-- **Nodemailer** (emails)
 - **bcrypt** (hachage de mots de passe)
 
 ### Qualité et tests
