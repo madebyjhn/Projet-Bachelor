@@ -20,6 +20,15 @@ jobs:
         with:
           node-version: 20
 
+      - name: Debug structure
+        run: |
+          echo "=== Racine ==="
+          ls -la
+          echo "=== projet-startup ==="
+          ls -la projet-startup/
+          echo "=== package-lock.json ==="
+          head -3 projet-startup/package-lock.json
+
       - name: Installation des dépendances
         run: npm ci
         working-directory: projet-startup
