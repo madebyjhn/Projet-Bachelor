@@ -4,15 +4,17 @@ import bcrypt from "bcrypt";
 import { SignJWT } from "jose";
 import { RowDataPacket } from "mysql2";
 import { logActivity } from "../../../../lib/activityLog";
+import { validateLoginInput } from "../../../../lib/auth";
 
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
 
-    if (!email || !password) {
+    const validation = validateLoginInput({ email, password });
+    if (!validation.ok) {
       return NextResponse.json(
-        { message: "Champs manquants" },
-        { status: 400 },
+        { message: validation.message },
+        { status: validation.status },
       );
     }
 

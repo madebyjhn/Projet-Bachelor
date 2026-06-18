@@ -2,15 +2,17 @@ import { pool } from "../../../../lib/db";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import { validateRegisterInput } from "../../../../lib/auth";
 
 export async function POST(req: Request) {
   try {
     const { name, email, password } = await req.json();
 
-    if (!name || !email || !password) {
+    const validation = validateRegisterInput({ name, email, password });
+    if (!validation.ok) {
       return NextResponse.json(
-        { message: "Champs manquants" },
-        { status: 400 },
+        { message: validation.message },
+        { status: validation.status },
       );
     }
 

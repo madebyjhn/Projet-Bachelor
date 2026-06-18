@@ -25,10 +25,10 @@ export function validateLoginInput(
     return { ok: false, message: "Format e-mail invalide", status: 400 };
   }
 
-  if (input.password.length < 6) {
+  if (input.password.length < 12) {
     return {
       ok: false,
-      message: "Mot de passe trop court (min 6 caractères)",
+      message: "Mot de passe trop court (min 12 caractères)",
       status: 400,
     };
   }
@@ -56,10 +56,10 @@ export function validateRegisterInput(
     return { ok: false, message: "Format e-mail invalide", status: 400 };
   }
 
-  if (input.password.length < 6) {
+  if (input.password.length < 12) {
     return {
       ok: false,
-      message: "Mot de passe trop court (min 6 caractères)",
+      message: "Mot de passe trop court (min 12 caractères)",
       status: 400,
     };
   }

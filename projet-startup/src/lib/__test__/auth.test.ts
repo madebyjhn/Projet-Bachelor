@@ -56,7 +56,7 @@ describe("validateLoginInput", () => {
     it("accepte un e-mail valide", () => {
       const result = validateLoginInput({
         email: "user@example.com",
-        password: "secret123",
+        password: "secret123456",
       });
       expect(result.ok).toBe(true);
     });
@@ -75,10 +75,10 @@ describe("validateLoginInput", () => {
       }
     });
 
-    it("accepte un mot de passe d'exactement 6 caractères", () => {
+    it("accepte un mot de passe d'exactement 12 caractères", () => {
       const result = validateLoginInput({
         email: "user@example.com",
-        password: "abcdef",
+        password: "abcdefghijkl",
       });
       expect(result.ok).toBe(true);
     });
@@ -88,7 +88,7 @@ describe("validateLoginInput", () => {
     it("renvoie { ok: true } pour des données correctes", () => {
       const result = validateLoginInput({
         email: "john.doe@startup.io",
-        password: "P@ssw0rd!",
+        password: "P@ssw0rd!123",
       });
       expect(result.ok).toBe(true);
     });
@@ -103,7 +103,7 @@ describe("validateRegisterInput", () => {
   const validInput = {
     name: "Alice Martin",
     email: "alice@startup.io",
-    password: "securePass1",
+    password: "securePass123",
   };
 
   describe("champs manquants", () => {
@@ -190,10 +190,10 @@ describe("validateRegisterInput", () => {
       if (!result.ok) expect(result.message).toMatch(/trop court/i);
     });
 
-    it("accepte un mot de passe de 6 caractères exactement", () => {
+    it("accepte un mot de passe de 12 caractères exactement", () => {
       const result = validateRegisterInput({
         ...validInput,
-        password: "123456",
+        password: "123456789012",
       });
       expect(result.ok).toBe(true);
     });
