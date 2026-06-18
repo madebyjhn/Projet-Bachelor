@@ -43,6 +43,7 @@ export async function POST(req: Request) {
       { status: 201 },
     );
   } catch (err) {
-    return NextResponse.json({ message: { err } }, { status: 500 });
+    console.error("REGISTER_ERROR", err);
+    return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
   }
 }

@@ -19,6 +19,13 @@ export const metadata: Metadata = {
   title: "StartupLab — Gestion financière pour startups",
   description:
     "Suivez vos revenus, dépenses et rentabilité en temps réel. Conçu pour les équipes qui veulent des chiffres clairs.",
+  openGraph: {
+    title: "StartupLab — Gestion financière pour startups",
+    description:
+      "Suivez vos revenus, dépenses et rentabilité en temps réel.",
+    type: "website",
+    locale: "fr_FR",
+  },
   icons: {
     icon: [
       {
