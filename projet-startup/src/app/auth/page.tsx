@@ -136,10 +136,27 @@ export default function AuthPage() {
             </span>
           </p>
         )}
+
+        {isRegister && (
+          <p className="text-center text-xs text-gray-400 mt-6 leading-relaxed">
+            En créant un compte, vous acceptez les{" "}
+            <a href="/cgu" target="_blank" className="text-violet-600 hover:underline">
+              conditions d&apos;utilisation
+            </a>{" "}
+            et la{" "}
+            <a href="/confidentialite" target="_blank" className="text-violet-600 hover:underline">
+              politique de confidentialité
+            </a>
+            .
+          </p>
+        )}
       </div>
 
-      <p className="text-gray-400 text-xs mt-8">
-        © 2024 Startup Finance. Tous droits réservés.
+      <p className="text-gray-400 text-xs mt-8 flex flex-wrap items-center justify-center gap-3">
+        <span>© 2024 StartupLab. Tous droits réservés.</span>
+        <a href="/mentions-legales" className="hover:underline">Mentions légales</a>
+        <a href="/cgu" className="hover:underline">CGU</a>
+        <a href="/confidentialite" className="hover:underline">Confidentialité</a>
       </p>
     </div>
   );
